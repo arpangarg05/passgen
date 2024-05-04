@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect } from 'react'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 
 export default function Pass() {
 
@@ -7,7 +7,9 @@ export default function Pass() {
   const [numbers, chooseNumbers] = useState(true);
   const [chars, chooseChars] = useState(false);
   const [password,setPassword] = useState("PassWord");
+  const [copied, setCopied] = useState(false)
 
+  const passwordRef = useRef(null);
   const generateRandomString = useCallback(() => {
     let characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
     let randomString = '';
@@ -21,18 +23,25 @@ export default function Pass() {
     }
     
     setPassword(randomString);
+    setCopied(false)
+
   }, [length,numbers,chars]
 )
 
- useEffect(()=>generateRandomString(),[length,numbers,chars]) 
+const handleCopy =()=>{
+  passwordRef.current.select()
+  window.navigator.clipboard.writeText(password)
+  setCopied(true);
+}
+useEffect(()=>generateRandomString(),[length,numbers,chars]) 
 
 
 
   return (
     <div className='w-[60%] mx-auto bg-gray-700 rounded-xl mt-20 p-5 flex flex-col'>
         <div className='flex justify-center h-12'>
-            <input type="text" className='w-[80%] bg-white rounded-l-lg px-2 text-xl font-normal text-orange-500' value={password} disabled />
-            <button className='bg-blue-700 w-[20%] rounded-r-lg text-white text-2xl'> Copy </button>
+            <input type="text" className='w-[80%] bg-white rounded-l-lg px-2 text-xl font-normal text-orange-500 outline-none' value={password} ref={passwordRef} readOnly />
+            <button className={`${!copied?'bg-blue-700':'bg-red-500'} w-[20%] rounded-r-lg text-white text-2xl`}  onClick={handleCopy}>{!copied? "Copy" :"Copied"} </button>
         </div>
         <div className=' mt-8 flex gap-1'>
             <input type="range" min="6" max="28" value={length} onChange={(e)=>(
